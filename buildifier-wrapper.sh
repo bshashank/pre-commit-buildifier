@@ -16,6 +16,8 @@ readonly linux_arm64_sha=18540fc10f86190f87485eb86963e603e41fa022f88a2d1b0cf52ff
 os=linux
 if [[ $OSTYPE == darwin* ]]; then
   os=darwin
+else if [[ $OSTYPE == msys* ]]; then
+  os=windows
 fi
 
 arch=amd64
@@ -30,6 +32,13 @@ readonly binary=$binary_dir/buildifier-$1
 shift
 
 if [[ -x "$binary" ]]; then
+  exec "$binary" "$@"
+fi
+
+if [[ $os == windows ]]; then
+  # Unable to download via curl, so go get instead
+  go get github.com/bazelbuild/buildtools/buildifier@${version}
+  ln -s "$(go env GOPATH)/bin/buildifier" "$binary"
   exec "$binary" "$@"
 fi
 
