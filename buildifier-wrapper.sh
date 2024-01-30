@@ -2,15 +2,15 @@
 
 set -euo pipefail
 
-readonly version=6.1.0
+readonly version=v6.4.0
 # shellcheck disable=SC2034
-readonly darwin_amd64_sha=fc61455f2137c8ea16c299a01cd1d3bfae74edab1da2b97778921691504a2809
+readonly darwin_amd64_sha=eeb47b2de27f60efe549348b183fac24eae80f1479e8b06cac0799c486df5bed
 # shellcheck disable=SC2034
-readonly darwin_arm64_sha=0eef36edd99798fa4ff7099257a847ecaad96a0ef41a5748e9091cd393ee20bc
+readonly darwin_arm64_sha=fa07ba0d20165917ca4cc7609f9b19a8a4392898148b7babdf6bb2a7dd963f05
 # shellcheck disable=SC2034
-readonly linux_amd64_sha=0b51a6cb81bc3b51466ea2210053992654987a907063d0c2b9c03be29de52eff
+readonly linux_amd64_sha=be63db12899f48600bad94051123b1fd7b5251e7661b9168582ce52396132e92
 # shellcheck disable=SC2034
-readonly linux_arm64_sha=5acdd65684105f73d1c65ee4737f6cf388afff8674eb88045aa3c204811b02f3
+readonly linux_arm64_sha=18540fc10f86190f87485eb86963e603e41fa022f88a2d1b0cf52ff252b5e1dd
 
 
 os=linux
@@ -43,7 +43,12 @@ if ! curl --fail --location --retry 5 --retry-connrefused --silent --output "$tm
   exit 1
 fi
 
-if echo "$sha  $tmp_binary" | shasum --check --status; then
+shabin=shasum
+if ! command -v "$shabin" >/dev/null; then
+  shabin=sha256sum
+fi
+
+if echo "$sha  $tmp_binary" | $shabin --check --status; then
   chmod +x "$tmp_binary"
 
   # Protect against races of concurrent hooks downloading the same binary
